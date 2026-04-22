@@ -1,0 +1,71 @@
+/* =============================== DEFAULT DATA DO NOT DELETE! =================
+ *
+ * */
+
+
+/* ======== DEFAULT ROLE 1
+ * super user who take care of the whole system
+ * START */
+
+INSERT INTO `roles`(`name`,`display_name`,`created_at`,`updated_at`) VALUES(
+    'root',
+    'Super User',
+    '2026-03-19 03:02:03',
+    '2026-03-19 03:02:03');
+
+
+
+INSERT INTO `roles`(`name`,`display_name`,`created_at`,`updated_at`) VALUES(
+    'boss',
+    'The Boss',
+    '2026-03-19 03:02:03',
+    '2026-03-19 03:02:03');
+
+
+
+
+INSERT INTO `roles`(`name`,`display_name`,`created_at`,`updated_at`) VALUES(
+    'manager',
+    'The Manager',
+    '2026-03-19 03:02:03',
+    '2026-03-19 03:02:03');
+
+
+
+
+INSERT INTO `roles`(`name`,`display_name`,`created_at`,`updated_at`) VALUES(
+    'account',
+    'The Account',
+    '2026-03-19 03:02:03',
+    '2026-03-19 03:02:03');
+
+
+
+
+INSERT INTO `roles`(`name`,`display_name`,`created_at`,`updated_at`) VALUES(
+    'booking',
+    'The Booking',
+    '2026-03-19 03:02:03',
+    '2026-03-19 03:02:03');
+
+
+
+
+INSERT INTO `roles`(`name`,`display_name`,`created_at`,`updated_at`) VALUES(
+    'staff',
+    'Staff (Viewer)',
+    '2026-03-19 03:02:03',
+    '2026-03-19 03:02:03');
+
+
+
+
+INSERT INTO `roles`(`name`,`display_name`,`created_at`,`updated_at`) VALUES(
+    'agency',
+    'Agency',
+    '2026-03-19 03:02:03',
+    '2026-03-19 03:02:03');
+
+
+
+/* ========================== END OF DEFAULT DATA ============================ */

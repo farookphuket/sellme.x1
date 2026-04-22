@@ -1,0 +1,8 @@
+/* ========================= DO NOT DELETE ME =======================
+ * ==============   DEFAULT TOUR LINK TO THE CREATED USER ===========
+ * */
+
+
+INSERT INTO `tour_user`(`tour_id`,`user_id`) VALUES(
+    '1',
+    '1');
