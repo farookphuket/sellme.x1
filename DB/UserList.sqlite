@@ -76,6 +76,26 @@ INSERT INTO `users`(`name`,`avatar`,`email`,`password`,`email_verified_at`,
     '2007-09-10 02:30:29',
     '2007-09-10 02:36:17');
 
+INSERT INTO `users`(`name`,`avatar`,`email`,`password`,`email_verified_at`,
+`created_at`,`updated_at`)VALUES(
+    'customer1',
+    '',
+    'customer1@me.me',
+    '$2y$10$iKi.yWrpeYupRyyC0IpcZeSevb0w7sDXFr6eEN0NFlNnvI3tml4A2',
+    '2007-09-10 02:36:17',
+    '2007-09-10 02:30:29',
+    '2007-09-10 02:36:17');
+
+
+INSERT INTO `users`(`name`,`avatar`,`email`,`password`,`email_verified_at`,
+`created_at`,`updated_at`)VALUES(
+    'customer2',
+    '',
+    'customer2@me.me',
+    '$2y$10$iKi.yWrpeYupRyyC0IpcZeSevb0w7sDXFr6eEN0NFlNnvI3tml4A2',
+    '2007-09-10 02:36:17',
+    '2007-09-10 02:30:29',
+    '2007-09-10 02:36:17');
 
 
 /* ============================================================================

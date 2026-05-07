@@ -6,21 +6,26 @@ import { useRouter } from 'next/navigation';
 import { deleteCookie, getCookie } from 'cookies-next';
 
 import { usePathname } from 'next/navigation';
+
 import {
-  LayoutDashboard,
-  Users,
-  Settings,
-  ShieldCheck,
-  LogOut,
-  ChevronRight
+    LayoutDashboard,
+    Users,
+    Map,
+    Ticket,
+    Settings,
+    ShieldCheck,
+    LogOut,
+    ChevronRight
 } from 'lucide-react';
 
 const menuItems = [
-  { name: 'Dashboard z', href: '/admin/dashboard', icon: LayoutDashboard },
-  { name: 'User Management', href: '/admin/users', icon: Users },
-  { name: 'Customer Management', href: '/admin/customers', icon: Users },
-  { name: 'System Roles', href: '/admin/roles', icon: ShieldCheck },
-  { name: 'Settings', href: '/admin/settings', icon: Settings },
+    { name: 'หน้าแรกจ้ะ', href: '/admin/dashboard', icon: LayoutDashboard },
+    { name: 'User Management', href: '/admin/users', icon: Users },
+    { name: 'Booking Manage', href: '/admin/bookings', icon: Ticket }, // ใช้ไอคอนรูปตั๋วที่นี่
+    { name: 'Tour Management', href: '/admin/tours', icon: Map },
+    { name: 'Customers', href: '/admin/customers', icon: Users },
+    { name: 'System Roles', href: '/admin/roles', icon: ShieldCheck },
+    { name: 'Settings', href: '/admin/settings', icon: Settings },
 ];
 
 export default function AdminSidebar() {
@@ -43,7 +48,7 @@ export default function AdminSidebar() {
     <aside className="w-64 min-h-screen bg-gray-900 border-r border-white/10 text-white p-4 flex flex-col">
       <div className="mb-10 px-2 py-4 border-b border-white/5">
         <h2 className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-          SELLME ADMIN
+          SELLME ADMIN หน้าแอดมินจ้ะ
         </h2>
         <p className="text-xs text-gray-500 uppercase tracking-widest mt-1">Super User</p>
       </div>

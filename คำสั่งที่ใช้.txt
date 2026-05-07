@@ -1,0 +1,158 @@
+
+ใน public/client/src/components สร้างฟอร์ม CustomerBookingTourFormModal สำหรับผู้ใช้ทั่วไป เป็นฟอร์มแบบ Modal 4 steps
+ฟอร์มต้องจดจำรายการที่ผู้ใช้กรอก หากเกิดการผิดพลาดหรือมีการ refresh page โดยไม่ได้ตั้งใจให้เอาข้อมูลนั้นๆ ที่กำลังกรอกในฟอร์ม step นั้นกลับมา
+พร้อม load form ขึ้นมา ลักษณะของฟอร์มมาในโทนสีน้ำเงินขาวที่เน้นอ่านง่ายดูสะอาดตา
+
+form step 1. เลือกทัวร์
+- เลือกวันที่จะไป โดยผู้ใช้ไม่สามารถเลือก วันนี้หรือวันที่ผ่านมาแล้วได้
+- ตัวเลือกทัวร์ form select รายการทัวร์ โดยค่าที่เลือกไว้แล้วคือ tour_id จาก tour detail หน้าที่ผู้ใช้ดูอยู่และกด link มาอ่าน ให้แสดงข้อมูลสูงสุดขนาด 100 ตัวอักษรเมื่อผู้ใช้เลือกทัวร์ id นั้นๆ
+- เลือกจำนวนคน โดยเอาราคา tour.price มาคูณกับจำนวนคน แสดงราคาต่อหน่วย และราคารวมที่ผู้ใช้ต้องจ่ายให้เห็นอย่างชัดเจน
+
+form step 2. การจ่ายเงิน
+- จ่ายเงินสด
+- จ่ายกับการ์ด จะมีค่าธรรมเนียม 4%
+- จ่าย deposit โดยเอา ราคาทัวร์เต็มมาลบกับตัวเลขที่กรอก และแสดงผลทั้ง เลขที่กรอกและจำนวนเงินที่ต้องจ่ายหน้างานอย่างชัดเจน
+
+form step 3. ข้อมูลลูกค้า
+- email
+- name, last_name, nick_name
+- hotel,room_number , pickup_at
+- special_request เช่น แพ้กุ้ง แพ้แมลงกัดต่อย
+
+
+form step 4. data summary ข้อมูลสรุปก่อนกดปุ่ม confirm to booking
+- แสดงผลเป็นแบบ 2 column โดยใน columnซ้าย ให้แสดง วัน date_departure , booking date , number to date_departure from now , จำนวนคน ,ราคาต่อ 1 คน ,ราคารวม ใน column ขวา แสดงรายละเอียดลูกค้า name ,email ,special_request ถ้ามี , ราคาที่ต้องจ่ายเพิ่ม ถ้ามี || ไม่มีการเก็บเงินเพิ่ม
+- ผู้ใช้ต้องเลือก I have read and understand ก่อนกดปุ่ม Make Booking หากไม่เลือกปุ่มเป็นสีแดงและจะไม่สามารถกดปุ่มได้ เมื่อเลือกแล้วปุ่มจะเป็นสีเขียวและกดได้
+
+
+Backend table field bookings
+
+   // ข้อมูลการชำระเงิน
+   $table->string('pay_method')->comment('เช่น cash, transfer, credit_card');
+   $table->string('paid_status')->default('pending');
+
+
+   $table->string('pay_on_arrival')->default('None');
+   $table->decimal('must_pay_on_departure', 10, 2)->default(0.00);
+   $table->decimal('total_price', 10, 2)->default(0.00);
+   $table->decimal('pay_deposit', 10, 2)->default(0.00);
+
+   $table->decimal('price_per_pax', 10, 2)->default(0.00);
+   $table->integer('total_pax')->default(1)->comment('จำนวนคน');
+
+   // ข้อมูลวันเวลาและการเดินทาง
+   $table->string('pickup_at')->nullable()->comment('สถานที่รับลูกค้า');
+   $table->string('special_request')->comment('เช่น แพ้กุ้ง,ไม่กินปลาร้า,ว่ายน้ำไม่เป็น, ');
+   $table->date('date_departure')->comment('วันที่ออกเดินทาง');
+   $table->dateTime('date_confirmed')->nullable()->comment('วันที่ยืนยันการจอง');
+
+// backend customer table name `customers` has field
+  $table->string('name');
+  $table->string('last_name');
+  $table->string('nick_name')->nullable();
+  $table->string('email')->nullable();
+  $table->string('hotel');
+  $table->string('room_number');
+
+
+
+
+
+// Qodo api key
+{ sk-uPLgRAckt3NGHx-5dp-mfn2bf5rHUYOvaUpoI2DHnXM-R-6pBzQyyFsKqW6tdGvgvKoFhT2Dk-BaZkasac7GOsc }
+
+
+/*
+================ Error 7 May 2026
+*/
+
+   Illuminate\Database\QueryException
+
+     SQLSTATE[23000]: Integrity constraint violation: 19 FOREIGN KEY constraint failed (Connection: sqlite, Database: /srv/http/sellme.x1/DB/DB.sqlite, SQL: insert into "customers" ("user_id", "name", "last_name", "nick_name", "email", "hotel", "room_number", "updated_at", "created_at") values (10, Chauncey, Ruecker, Helena, ari44@example.net, Hilton Arcadia, 177w, 2026-05-07 10:18:26, 2026-05-07 10:18:26))
+
+
+
+     :: Synchronizing package databases...
+     error: failed to synchronize all databases (unable to lock database)
+
+
+/*
+=============== End Error 7 May 2026
+*/
+
+   BadMethodCallException
+
+     Call to undefined method App\Models\Customer::factory()
+
+       at vendor/laravel/framework/src/Illuminate/Support/Traits/ForwardsCalls.php:67
+            63▕      * @throws \BadMethodCallException
+                 64▕      */
+                      65▕     protected static function throwBadMethodCallException($method)
+                           66▕     {
+                                  ➜  67▕         throw new BadMethodCallException(sprintf(
+                                       68▕             'Call to undefined method %s::%s()', static::class, $method
+                                            69▕         ));
+                                       70▕     }
+                                            71▕ }
+
+                                  ))
+                            }
+
+
+
+
+/srv/http/sellme.x1/public/client/node_modules/next/dist/server/config.js:787
+            throw new Error(`Configuring Next.js via '${(0, _path.basename)(nonJsPath)}' is not supported. Please replace the file with 'next.config.js' or 'next.config.mjs'.`);
+                              ^
+
+                              Error: Configuring Next.js via 'next.config.ts' is not supported. Please replace the file with 'next.config.js' or 'next.config.mjs'.
+                                  at loadConfig (/srv/http/sellme.x1/public/client/node_modules/next/dist/server/config.js:787:19)
+                                      at async Module.nextDev (/srv/http/sellme.x1/public/client/node_modules/next/dist/cli/next-dev.js:175:14)
+
+
+
+file:///srv/http/sellme.x1/public/client/next.config.mjs:1
+import type { NextConfig } from "next";
+            ^
+
+            SyntaxError: Unexpected token '{'
+
+
+            ./src/components/TourDetailView.tsx
+            Attempted import error: 'ThaiBaht' is not exported from '__barrel_optimize__?names=Clock,Map,MapPin,ShieldCheck,ThaiBaht,X!=!lucide-react' (imported as 'ThaiBaht').
+
+            Import trace for requested module:
+            ./src/components/TourDetailView.tsx
+            ./src/app/(admin)/admin/tours/page.tsx
+             GET /admin/tours 200 in 4297ms
+
+
+
+อยากให้ฟอร์มเป็นแบบ 4 step ดังนี้
+
+หากมีการกรอกข้อมูลใดๆ ในฟอ์มแล้วให้เก็บค่าตัวแปรเอาไว้ หากเกิดการผิดพลาดหรือมีการ refresh page โดยไม่ได้ตั้งใจให้เอาข้อมูลนั้นๆ ที่ยังไม่ได้บันทึกกลับมา
+
+
+หน้าแรกมีฟิลด์ ให้เลือกทัวร์ เมื่อเลือก ทัวร์ก็ให้แสดง ผลลัพธ์ที่เลือก เช่น tour.title tour.price
+ให้กรอกจำนวนคน 1-40 เมื่อเลือกจำนวนคนแล้วให้เอา tour.price มาคูณกับจำนวนคน แล้วเก็บค่าไว้ในตัวแปร
+total_price
+
+หากไม่ระบุก็จะไม่สามารถกดไปหน้าต่อไปได้
+
+หน้าที่สอง เป็นวิธีชำระเงิน  ให้แสดงเป็น radio box เลือกได้แค่อย่างเดียว เช่น
+ -  จ่ายเงินสด
+ -  จ่ายกับการ์ด(ถ้าจ่ายผ่านบัตรเครดิตลูกค้าต้องเสียค่าธรรมเนียม 4%+total_price )
+ -  จ่ายมัดจำ โดยเอาจำนวนที่จ่ายมัดจำไปลบกับจำนวน  total_pricerice
+ -  จากนั้นเก็บตัวแปรไว้ใน text box name must_pay_on_departure
+
+หน้าที่ สาม
+name nick_name last_name  โรงแรม เบอร์ห้อง สถานที่รับ
+หากไม่ระบุก็จะไม่สามารถกดไปหน้าต่อไปได้
+
+
+หน้าที่ สี่
+สรุปรายการที่ลูกค้ากรอกทั้งหมดเป็นแบบสองคอลัมม์ เน้นอ่านง่ายๆ ข้อมูลชัดเจน
+มีช่องให้เลือกว่า ข้อมูลถูกต้องก่อนที่จะกดปุ่ม confirm booking ซึ่งหากไม่เลือกช่องนี้ก็จะไม่สามารถกด ปุ่ม confirm booking ได้
+
+
+

@@ -53,7 +53,7 @@ export default function CustomerManager() {
 
         <button type="submit" className="md:col-span-5 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition flex items-center justify-center gap-2">
           {isEditing ? <Edit className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
-          {isEditing ? 'Update Customer' : 'Add New Customer'}
+          {isEditing ? 'Update Customer x' : 'Add New Customer'}
         </button>
       </form>
 

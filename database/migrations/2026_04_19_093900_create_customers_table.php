@@ -13,9 +13,11 @@ return new class extends Migration
     {
         Schema::create('customers', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->string('name');
             $table->string('last_name');
             $table->string('nick_name')->nullable();
+            $table->string('email')->nullable();
             $table->string('hotel');
             $table->string('room_number');
             $table->timestamps();

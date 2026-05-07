@@ -62,5 +62,12 @@ class DatabaseSeeder extends Seeder
 
             Model::reguard();
 
+if (\App\Models\Customer::count() == 0) {
+        \App\Models\Customer::factory(200)->create();
+    }
+
+    // 2. สร้าง Booking 200 รายการ
+    \App\Models\Booking::factory(200)->create();
+
     }
 }

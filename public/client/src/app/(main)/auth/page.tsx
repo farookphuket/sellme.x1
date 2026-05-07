@@ -21,7 +21,7 @@ const getRedirectPath = (role) => {
     case 'booking':   return '/booking';
     case 'staff':     return '/staff';
     case 'agency':    return '/agency';
-    // case 'customer':  return '/profile';
+    case 'customer':  return '/my-bookings';
     default:          return '/profile';
   }
 };
