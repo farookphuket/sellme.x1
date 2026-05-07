@@ -42,6 +42,38 @@ My sellme project on Laravel+NextJS has created on 13 Jan 2026
 
 ---
 
+## my Update 
+> the list of update on this project 
+
+--- 
+
+### update 7 May 2026 
+
+> last update today made change 
+
+
+1. admin page 
+  [admin_page]:https://ia600801.us.archive.org/27/items/how-to_pic_cover/sellme-admin.png "the admin page "
+
+  ![admin page][admin_page]
+
+2. customer page 
+
+  
+  [customer_page]:https://ia800801.us.archive.org/27/items/how-to_pic_cover/sellme-customer_7-may-26.png "the customer page "
+
+  ![customer page][customer_page]
+
+3. login page 
+  
+  [login_page]:https://dn710903.ca.archive.org/0/items/how-to_pic_cover/sellme-auth.png "the login page "
+
+  ![login page][login_page]
+
+
+
+
+--- 
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
 
