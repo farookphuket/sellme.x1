@@ -1,3 +1,4 @@
+
 # Sellme project
 
 > this project is write on Laravel+NextJS+TailwinCSS. 
@@ -44,6 +45,24 @@ My sellme project on Laravel+NextJS has created on 13 Jan 2026
 
 ## my Update 
 > the list of update on this project 
+
+--- 
+### update 9 May 2026 
+
+> re-design the admin page use modal component and added pagination!
+
+```
+```
+// this image full url
+https://ia600801.us.archive.org/27/items/how-to_pic_cover/pagination-admin.png
+
+```
+```
+
+
+  [admin_pagination]:https://ia600801.us.archive.org/27/items/how-to_pic_cover/pagination-admin.png "the admin page show pagination"
+
+  ![admin page pagination][admin_pagination]
 
 --- 
 

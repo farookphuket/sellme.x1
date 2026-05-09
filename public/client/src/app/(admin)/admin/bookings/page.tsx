@@ -2,6 +2,12 @@
 import React, { useState, useEffect } from 'react';
 import api from '@/lib/axios';
 import BookingFormSteps from '@/components/BookingFormSteps';
+
+
+
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import Pagination from '@/components/Pagination';
+
 import {
   Plus, Edit, Trash2, X,
   ChevronLeft, ChevronRight, AlertCircle
@@ -16,22 +22,67 @@ export default function BookingManagement() {
   // เก็บข้อมูล Booking ที่กำลังจะแก้ไข (ถ้าเป็น null คือการเพิ่มใหม่)
   const [editingData, setEditingData] = useState<any>(null);
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 20;
+
+
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [lastPage, setLastPage] = useState(1);
+  // อ่านหน้าปัจจุบันจาก URL
+  const currentPage = Number(searchParams.get('page')) || 1;
+// 1. อ่านค่าจาก URL เป็นลำดับแรก
+  const queryPage = searchParams.get('page');
+  const itemsPerPage = 10;
 
   useEffect(() => {
-    fetchBookings();
-  }, []);
 
-  const fetchBookings = async () => {
+
+
+    // 2. Logic การจดจำหน้าล่าสุด
+    if (!queryPage) {
+      // ถ้าเปิดเข้ามาแบบไม่มี ?page= ให้ไปเช็คใน localStorage
+      const savedPage = localStorage.getItem('last_booking_page');
+      if (savedPage) {
+        router.replace(`${pathname}?page=${savedPage}`);
+        return; // ให้ useEffect ทำงานอีกรอบหลังจาก URL เปลี่ยน
+      }
+    } else {
+      // ถ้ามี ?page= ใน URL แล้ว ให้บันทึกลง localStorage ไว้กันลืม
+      localStorage.setItem('last_booking_page', queryPage);
+    }
+
+    const currentPage = Number(queryPage) || 1;
+    fetchBookings(currentPage);
+
+  }, [queryPage]);
+
+  const fetchBookings = async (page:number) => {
     setLoading(true);
+        /*
     try {
       const res = await api.get('/bookings');
       // ตรวจสอบโครงสร้าง Response ให้ตรงกับ Backend ของคุณ
-      setBookings(res.data.bookings || []);
+      setBookings(res.data.bookings.data || []);
       setTourOptions(res.data.tours || []);
     } catch (err) {
       console.error("Fetch error:", err);
+    }
+*/
+
+    try {
+      const response = await api.get(`/bookings?page=${page}`);
+      if (response.data.success) {
+
+        setBookings(response.data.bookings);
+
+        setTourOptions(response.data.tours || []);
+        setLastPage(response.data.pagination.last_page);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      setLoading(false);
     }
     setLoading(false);
   };
@@ -39,6 +90,12 @@ export default function BookingManagement() {
   // ฟังก์ชันรับข้อมูลจาก Component ลูกมา Save ลงฐานข้อมูล
   const handleBookingSuccess = async (finalData: any) => {
     try {
+    // ตรวจสอบความถูกต้องของข้อมูลก่อนส่ง (Optional)
+    const payload = {
+       ...finalData,
+       special_request: finalData.special_request || 'None',
+       // ถ้า email ต้องเก็บในตาราง customer อาจจะต้องจัดการแยกที่ Backend
+    };
       if (editingData?.id) {
         // กรณีแก้ไข
         await api.put(`/bookings/${editingData.id}`, finalData);
@@ -50,7 +107,7 @@ export default function BookingManagement() {
 
       setIsOpen(false);
       setEditingData(null);
-      fetchBookings(); // โหลดข้อมูลใหม่
+      fetchBookings(currentPage); // โหลดข้อมูลใหม่
       alert("บันทึกข้อมูลเรียบร้อยแล้ว");
     } catch (err) {
       console.error("Save error:", err);
@@ -69,13 +126,16 @@ export default function BookingManagement() {
   };
 
 
+const handlePageChange = (newPage: number) => {
+    // บันทึกหน้าใหม่ลง Storage ทันทีที่คลิกเปลี่ยนหน้า
+    localStorage.setItem('last_booking_page', newPage.toString());
+
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('page', newPage.toString());
+    router.push(`${pathname}?${params.toString()}`);
+  };
 
 
-  // Logic การทำ Pagination
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = Array.isArray(bookings) ? bookings.slice(indexOfFirstItem, indexOfLastItem) : [];
-  const totalPages = Math.ceil(bookings.length / itemsPerPage);
 
   return (
     <div className="p-8 bg-gray-50 min-h-screen font-sans">
@@ -109,7 +169,7 @@ export default function BookingManagement() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
-                {currentItems.map((booking: any) => (
+                {bookings.map((booking : any) => (
                   <tr key={booking.id} className="group hover:bg-blue-50/30 transition-colors">
                     <td className="px-6 py-5">
                       <div className="font-bold text-gray-900">
@@ -158,25 +218,14 @@ export default function BookingManagement() {
       )}
 
       {/* Pagination Controls */}
-      {totalPages > 1 && (
-        <div className="flex justify-center items-center gap-4 mt-8">
-          <button
-            disabled={currentPage === 1}
-            onClick={() => setCurrentPage(prev => prev - 1)}
-            className="p-2 rounded-xl bg-white border disabled:opacity-30"
-          >
-            <ChevronLeft />
-          </button>
-          <span className="font-bold text-blue-900">Page {currentPage} of {totalPages}</span>
-          <button
-            disabled={currentPage === totalPages}
-            onClick={() => setCurrentPage(prev => prev + 1)}
-            className="p-2 rounded-xl bg-white border disabled:opacity-30"
-          >
-            <ChevronRight />
-          </button>
-        </div>
-      )}
+
+            {/* ส่วน Pagination - โชว์ด้านล่างของ Grid ข้อมูล */}
+            <Pagination
+              currentPage={currentPage}
+              lastPage={lastPage}
+              onPageChange={handlePageChange}
+            />
+
 
       {/* Modal Section */}
       {isOpen && (

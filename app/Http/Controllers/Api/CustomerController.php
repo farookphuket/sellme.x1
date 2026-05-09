@@ -12,7 +12,7 @@ class CustomerController extends Controller
 {
     //
     public function index() {
-        return response()->json(Customer::latest()->get());
+        return response()->json(Customer::latest()->paginate(10));
     }
 
     public function store(Request $request) {

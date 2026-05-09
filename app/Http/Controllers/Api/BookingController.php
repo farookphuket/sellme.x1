@@ -21,12 +21,23 @@ class BookingController extends Controller
         // $tours สำหรับนำไปใช้ในหน้า Booking Form (เช่น Select Box)
         $tours = Tour::all();
 
-        // return ข้อมูลการจองพร้อม Tour และ Customer โดยเอาที่เพิ่มล่าสุดขึ้นก่อน
-        $bookings = Booking::with(['tour', 'customer'])->latest()->get();
+        // return ข้อมูลการจองพร้อม Tour และ Customer โดยเอาที่เพิ่มล่าสุดขึ้นก่อน พร้อมแบ่งหน้า
+        // โดยให้ Frontend NextJS จดจำหน้าล่าสุดที่ดูหากเกิดการเปลี่ยน url อื่น หรือ refresh โดยไม่ได้ตั้งใจให้สามารถกลับไปหน้าที่จำไว้ได้
+        $bookings = Booking::with(['tour', 'customer'])->latest()->paginate(10);
 
         return response()->json([
-            'tours' => $tours,
-            'bookings' => $bookings
+'success' => true,
+        'tours' => $tours,
+        'bookings' => $bookings->items(),
+
+                'pagination' => [
+                    'total' => $bookings->total(),           // จำนวนรายการทั้งหมดที่มีในฐานข้อมูล
+                    'per_page' => $bookings->perPage(),     // จำนวนต่อหน้า (20)
+                    'current_page' => $bookings->currentPage(), // หน้าที่กำลังเรียกดูอยู่
+                    'last_page' => $bookings->lastPage(),    // จำนวนหน้าทั้งหมด
+                    'from' => $bookings->firstItem(),
+                    'to' => $bookings->lastItem()
+                ]
         ]);
     }
 
@@ -41,7 +52,7 @@ class BookingController extends Controller
             'customer.name' => 'required|string|max:255',
             'customer.last_name' => 'required|string|max:255',
             'customer.nick_name' => 'nullable|string',
-            'customer.email' => 'nullable|string',
+            'customer.email' => 'nullable|email',
             'customer.hotel' => 'nullable|string',
             'customer.room_number' => 'nullable|string',
 
@@ -151,6 +162,7 @@ public function myBookings(Request $request)
         $validator = Validator::make($request->all(), [
             'name' => 'required',
             'last_name' => 'required',
+            'email' => 'required | email',
             'tour_id' => 'required|exists:tours,id',
             'date_departure' => 'required|date'
         ]);
@@ -163,7 +175,7 @@ public function myBookings(Request $request)
             DB::transaction(function () use ($request, $booking, $customer) {
                 // แก้ไขข้อมูลลูกค้า
                 $customer->update($request->only([
-                    'name', 'last_name', 'nick_name', 'hotel', 'room_number'
+                    'name', 'last_name', 'nick_name', 'email','hotel', 'room_number'
                 ]));
 
                 // แก้ไขข้อมูลการจอง[cite: 2]

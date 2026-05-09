@@ -22,13 +22,14 @@ export default function CustomerTourPage() {
   const [selectedTour, setSelectedTour] = useState<any>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+
+
   const [searchQuery, setSearchQuery] = useState("");
   const [lastPage, setLastPage] = useState(1);
-
   // อ่านหน้าปัจจุบันจาก URL
   const currentPage = Number(searchParams.get('page')) || 1;
 
-// 1. อ่านค่าจาก URL เป็นลำดับแรก
+    // 1. อ่านค่าจาก URL เป็นลำดับแรก
   const queryPage = searchParams.get('page');
 
 

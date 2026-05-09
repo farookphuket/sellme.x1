@@ -19,14 +19,40 @@ export default function TourDetailView({ isOpen, onClose, tour }: Props) {
     // ตัวอย่างถ้าพี่เก็บ token ไว้ใน localStorage
     const token = localStorage.getItem('token');
 
-  const tourOptions = [tour, ...allTours.filter((item: any) => item.id !== tour.id)];
+  //const tourOptions = [tour, ...allTours.filter((item: any) => item.id !== tour.id)];
+// เปลี่ยนบรรทัดที่ 22 เดิม เป็นแบบนี้ครับ
+const tourOptions = Array.isArray(allTours)
+  ? [tour, ...allTours.filter((item: any) => item.id !== tour?.id)]
+  : [tour]; // ถ้ายังโหลดไม่เสร็จ หรือไม่ใช่ Array ให้มีแค่ทัวร์ปัจจุบันตัวเดียวก่อน
 
   useEffect(() => {
+if (!apiUrl) return;
+
+  fetch(`${apiUrl}/tours`)
+    .then(res => res.json())
+    .then(res => {
+      // ตรวจสอบโครงสร้างที่ Laravel ส่งมา
+      // ถ้ามาแบบ { success: true, data: [...] } ให้เอาแค่ data
+      if (res && res.data && Array.isArray(res.data)) {
+        setAllTours(res.data);
+      } else if (Array.isArray(res)) {
+        setAllTours(res);
+      } else {
+        setAllTours([]); // ถ้ามาท่าแปลกๆ ให้เซ็ตเป็น Array ว่างไว้ก่อน
+      }
+    })
+    .catch(err => {
+      console.error("Fetch tours error:", err);
+      setAllTours([]);
+    });
+        /*
     // สมมติว่าพี่มี Route ใน Laravel ที่ส่งทัวร์ทั้งหมดออกมา
-    fetch('/api/tours')
+    fetch(`${apiUrl}/tours`)
       .then(res => res.json())
-      .then(data => setAllTours(data));
-  }, []);
+      .then(data => setAllTours(data || data.data));
+      */
+
+  }, [apiUrl]);
 
   // ถ้าไม่ได้เปิด Modal หรือไม่มีข้อมูลทัวร์ ไม่ต้องแสดงอะไร
   if (!isOpen || !tour) return null;

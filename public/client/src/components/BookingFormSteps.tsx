@@ -3,7 +3,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { setCookie, getCookie, deleteCookie } from 'cookies-next';
 import {
   ChevronLeft, ChevronRight, Save, CheckCircle2,
-  User, Hotel, Ticket, Wallet, CreditCard, Banknote, X, Calendar
+  User, Hotel, FileText,Ticket, Wallet, CreditCard, Banknote, X, Calendar
 } from 'lucide-react';
 
 interface Props {
@@ -23,11 +23,19 @@ export default function BookingFormSteps({ tourOptions, initialData, onClose, on
   const minDate = tomorrow.toISOString().split('T')[0];
 
   const initialForm = {
-    name: '', last_name: '', nick_name: '',
+
+
+        name: '',
+        last_name: '',
+        nick_name: '',
+        email:'',
+
+        special_request:'',
     hotel: '', room_number: '', pickup_at: '',
     tour_id: '',
     price_per_pax: 0,
     total_pax: 1,
+        must_pay_on_departure:'',
     pay_method: 'cash',
     pay_deposit: 0,
     date_departure: minDate,
@@ -47,6 +55,11 @@ export default function BookingFormSteps({ tourOptions, initialData, onClose, on
         name: initialData.customer?.name || initialData.name || '',
         last_name: initialData.customer?.last_name || initialData.last_name || '',
         nick_name: initialData.customer?.nick_name || initialData.nick_name || '',
+
+        email: initialData.customer?.email || initialData.email || '',
+        special_request: initialData.customer?.special_request || initialData.special_request || '',
+        must_pay_on_departure : initialData.customer?.must_pay_on_departure  || initialData.must_pay_on_departure  || '',
+
         hotel: initialData.customer?.hotel || initialData.hotel || '',
         room_number: initialData.customer?.room_number || initialData.room_number || '',
         total_pax: initialData.total_pax || 1,
@@ -86,7 +99,10 @@ export default function BookingFormSteps({ tourOptions, initialData, onClose, on
     let fee = 0;
     let payOnArrival = 0;
     if (formData.pay_method === 'credit') { fee = baseTotal * 0.04; }
-    else if (formData.pay_method === 'deposit') { payOnArrival = baseTotal - (Number(formData.pay_deposit) || 0); }
+    else if (formData.pay_method === 'deposit') {
+            payOnArrival = baseTotal - (Number(formData.pay_deposit) || 0);
+            formData.must_pay_on_departure = payOnArrival;
+        }
     const grandTotal = baseTotal + fee;
     const paidStatus = formData.pay_method === 'credit' ? 'paid by credit card' :
                       formData.pay_method === 'deposit' ? `collect ${payOnArrival.toLocaleString()}` : 'paid by cash';
@@ -103,7 +119,18 @@ export default function BookingFormSteps({ tourOptions, initialData, onClose, on
   };
 
   const handleFinalSubmit = () => {
-    const finalData = { ...formData, total_price: calc.grandTotal, paid_status: calc.paidStatus, pay_on_arrival: calc.pay_on_arrival };
+    const finalData = { ...formData,
+            customer:{
+                name: formData.name,
+                last_name:formData.last_name,
+                nick_name:formData.nick_name,
+                email:formData.email
+            },
+            total_price: calc.grandTotal,
+            paid_status: calc.paidStatus,
+            pay_on_arrival: calc.pay_on_arrival,
+            must_pay_on_departure : calc.pay_on_arrival
+        };
     deleteCookie('temp_booking_data'); // ลบ Draft เมื่อสำเร็จ
     onSuccess(finalData);
   };
@@ -114,21 +141,21 @@ export default function BookingFormSteps({ tourOptions, initialData, onClose, on
   if (!isMounted) return null;
 
   return (
-    <div className="bg-white w-full max-w-5xl rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col border border-gray-100 relative">
-      <button onClick={onClose} className="absolute top-6 right-6 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-all z-10">
-        <X size={24} />
+    <div className="bg-white w-full max-w-4xl rounded-[2rem] shadow-2xl overflow-hidden flex flex-col border border-gray-100  max-h-[90vh] relative">
+      <button onClick={onClose} className="absolute top-4 right-4 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-all z-10">
+        <X size={20} />
       </button>
 
-      <div className="bg-gray-50/50 p-6 border-b flex justify-between items-center pr-20">
-        <div className="flex gap-2">
+      <div className="bg-gray-50/50 p-4 border-b flex justify-between items-center pr-16">
+        <div className="flex gap-1.5">
           {[1, 2, 3, 4].map(num => (
-            <div key={num} className={`w-10 h-2 rounded-full ${step >= num ? 'bg-blue-600' : 'bg-gray-200'}`} />
+            <div key={num} className={`w-8 h-1.5 rounded-full ${step >= num ? 'bg-blue-600' : 'bg-gray-200'}`} />
           ))}
         </div>
-        <span className="text-sm font-black text-blue-900 uppercase tracking-widest">Step {step} of 4</span>
+        <span className="text-xs font-black text-blue-900 uppercase tracking-widest">Step {step} of 4</span>
       </div>
 
-      <div className="p-10 min-h-[550px]">
+      <div className="p-6 md:p-8  overflow-y-auto custom-scrollbar">
         {/* Step 1: Tour & Date */}
         {step === 1 && (
           <div className="space-y-8 animate-in fade-in duration-500">
@@ -195,7 +222,28 @@ export default function BookingFormSteps({ tourOptions, initialData, onClose, on
                 <input placeholder="ชื่อ *" value={formData.name} onChange={(e) => handleInputChange('name', e.target.value)} className="w-full p-4 bg-gray-50 rounded-2xl font-bold border-2 border-transparent focus:border-blue-500 outline-none" />
                 <input placeholder="นามสกุล *" value={formData.last_name} onChange={(e) => handleInputChange('last_name', e.target.value)} className="w-full p-4 bg-gray-50 rounded-2xl font-bold border-2 border-transparent focus:border-blue-500 outline-none" />
                 <input placeholder="ชื่อเล่น" value={formData.nick_name} onChange={(e) => handleInputChange('nick_name', e.target.value)} className="w-full p-4 bg-gray-50 rounded-2xl font-bold border-2 border-transparent focus:border-blue-500 outline-none" />
+
+                <input placeholder="E-Mail" value={formData.email} onChange={(e) => handleInputChange('email', e.target.value)} className="w-full p-4 bg-gray-50 rounded-2xl font-bold border-2 border-transparent focus:border-blue-500 outline-none" />
               </div>
+
+            </div>
+
+
+              {/* Special Request */}
+              <div className="space-y-3">
+                <label className="text-xs font-bold text-gray-500 uppercase flex items-center gap-2">
+                  <FileText size={16} className="text-blue-600" />
+                  ข้อมูลเพิ่มเติม (ไม่จำเป็น)
+                </label>
+                <textarea
+                  placeholder="เช่น แพ้กุ้ง, แพ้แมลงกัดต่อย, ไม่กินปลาร้า, ว่ายน้ำไม่เป็น"
+                  value={formData.special_request}
+                  onChange={(e) => handleInputChange('special_request', e.target.value)}
+                  className="w-full p-4 bg-gray-50 rounded-xl font-normal border-2 border-transparent hover:border-blue-300 focus:border-blue-600 outline-none transition-colors min-h-[120px] resize-none"
+                />
+              </div>
+
+
               <div className="space-y-4">
                 <h3 className="font-black text-blue-600 flex items-center gap-2"><Hotel size={18}/> ข้อมูลที่พัก</h3>
                 <input placeholder="ชื่อโรงแรม *" value={formData.hotel} onChange={(e) => handleInputChange('hotel', e.target.value)} className="w-full p-4 bg-gray-50 rounded-2xl font-bold border-2 border-transparent focus:border-blue-500 outline-none" />
@@ -205,7 +253,6 @@ export default function BookingFormSteps({ tourOptions, initialData, onClose, on
                 </div>
               </div>
             </div>
-          </div>
         )}
 
         {/* Step 4: Summary */}

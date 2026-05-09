@@ -1,10 +1,9 @@
-"use client";
-import React, { useState, useEffect } from 'react';
+"use client"; import React, { useState, useEffect } from 'react';
 import api from '@/lib/axios';
 import { getCookie, setCookie } from 'cookies-next';
 
-import dynamic from 'next/dynamic';
 
+import dynamic from 'next/dynamic';
 const TourDetailView = dynamic(
   () => import('@/components/TourDetailView').then((mod) => mod.default),
   {
@@ -35,6 +34,7 @@ const [tourToShow, setTourToShow] = useState(null);
   }, []);
 
 
+    /*
 
 const fetchTours = async (page: number) => {
     console.log("Starting fetch for page:", page); // DEBUG 1
@@ -54,6 +54,7 @@ const fetchTours = async (page: number) => {
       // กรณีโครงสร้าง Laravel มาตรฐาน (Paginated)
       // ข้อมูลจะอยู่ที่ res.data และมี meta หรือ pagination keys
       if (res && res.data) {
+                //console.log("API if",res);
         setTours(res.data);
         setPagination({
           current_page: res.current_page || res.meta?.current_page || page,
@@ -84,6 +85,46 @@ const fetchTours = async (page: number) => {
       setIsLoading(false);
     }
   };
+*/
+
+const fetchTours = async (page: number) => {
+  setIsLoading(true);
+  try {
+    // ระบุให้ชัดเจนว่าเป็น /api/tours หรือเปล่า?
+    // ถ้า axios baseURL พี่เซ็ตไว้ที่ /api แล้ว ก็ใช้ /tours ถูกต้องครับ
+    const response = await api.get(`/tours`, {
+      params: { page: page }
+    });
+
+    const res = response.data;
+
+    // สำคัญ: เช็คโครงสร้างข้อมูล Laravel Pagination
+    // ปกติจะเป็น { current_page: 1, data: [...], last_page: 20 }
+    if (res && res.data) {
+      setTours(res.data);
+      setPagination({
+        current_page: res.pagination.current_page,
+        last_page: res.pagination.last_page,
+        total: res.pagination.total
+      });
+    } else {
+      setTours(res || []);
+    }
+
+            /*
+    setCookie('last_tour_page', page.toString());
+    */
+setCookie('last_tour_page', page.toString(), { maxAge: 60 * 60 * 24 });
+  } catch (error: any) {
+    console.error("ตรวจสอบ Error ตรงนี้ครับพี่ ->", error.response?.status);
+    if(error.response?.status === 404) {
+      console.error("หา API Path นี้ไม่เจอ: ตรวจสอบ Route ใน Laravel ครับ");
+    }
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
 
 const handleView = (tour) => {
